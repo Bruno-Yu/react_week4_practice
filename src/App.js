@@ -105,7 +105,6 @@ function SignUp() {
         text: `註冊成功餒! 馬上幫你轉到登入ya~`,
       });
       navigate('/');
-      window.history.go(0);
     }).catch(error => {
       console.log(error);
       Swal.fire({
@@ -113,7 +112,6 @@ function SignUp() {
       title: '我很抱歉...',
       text: `${error.response.data.message}:${error.response.data.error[0]}`,
       })
-      window.history.go(0);
 
       return;
     })
