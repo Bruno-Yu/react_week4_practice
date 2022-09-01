@@ -6,6 +6,7 @@ import { Routes, Route, Link, Outlet, useNavigate } from 'react-router-dom';
 import { createContext, useContext } from 'react';
 import { useForm } from "react-hook-form";
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
   const AuthContext = createContext(null);
 
@@ -14,25 +15,41 @@ function LogIn() {
   const { token, setToken, userName, setUserName , setData} = useContext(AuthContext);
   const navigate = useNavigate();
     function getData() {
-     const ApiUrl = 'https://todoo.5xcamp.us/todos'
+    const ApiUrl = 'https://todoo.5xcamp.us/todos'
     axios.get(ApiUrl).then(res => { 
       setData(res.data.todos);
     })
-   }
-  const onSubmit = data => {
+    }
+  const onSubmitEvent = data => {
     const ApiUrl = 'https://todoo.5xcamp.us/users/sign_in'
-    axios.post(ApiUrl, { user: data }).then(res => {
-      alert(`送出成功:${JSON.stringify(res.data)}`);
-      console.log(res);
+    axios.post(ApiUrl, {
+      user: {
+        email: data.email , 
+      password: data.password
+    } }).then(res => {
+
+      // alert(`送出成功:${JSON.stringify(res.data)}`);
+      // console.log(res);
       setToken(res.headers.authorization);
       setUserName(res.data.nickname);
       console.log(token, userName);
+    Swal.fire({
+      icon: 'success',
+      title: '你進入了~ 羞',
+      text: `成功登錄哩~ 立馬跳轉`,
+    })
       // 存驗證權杖進headers
       axios.defaults.headers.common["Authorization"] = res.headers.authorization;
       getData();
       navigate('/todos');
     }).catch(error => {
-      alert(`送出失敗:${JSON.stringify(error.data)}`)  
+        Swal.fire({
+      icon: 'error',
+      title: '我很抱歉...',
+      text: `${error.response.data.message}:${error.message}`,
+        })
+      console.log(error);
+      window.history.go(0)
     })
     console.log(data);
 
@@ -45,7 +62,7 @@ function LogIn() {
                 <img className="d-m-n" src="https://upload.cc/i1/2022/03/23/tj3Bdk.png" alt="workImg" />
             </div>
         <div>
-          <form className="formControls" onSubmit={handleSubmit(onSubmit)}>
+          <form className="formControls" onSubmit={handleSubmit(onSubmitEvent)}>
             <h2 className="formControls_txt">最實用的線上代辦事項服務</h2>
             <label className="formControls_label" htmlFor="email">Email</label>
             <input className="formControls_input" name='email' id='email'  type="email" placeholder="請輸入 email" {...register("email", { required: true, pattern: /^\S+@\S+$/i })} />
@@ -68,20 +85,38 @@ function SignUp() {
     const navigate = useNavigate();
   const onSubmit = data => {
     const ApiUrl = `https://todoo.5xcamp.us/users`
-    delete data.signUpConfirmed;
-    const userData =  JSON.stringify({ user: data });
-    axios({
-      method: 'POST',
-      url: ApiUrl,
-      data: userData,
-      headers: {"Content-Type": "application/json", "accept":"application/json"}
-    }).then(res => {
-    alert(`送出成功:${JSON.stringify(res.data)}`)  
+    if (data.signUpConfirmed !== data.signUpPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: '我們不一樣~',
+        text: `大會報告! 你的密碼不一樣喔`,
+      });
+      return;
+    }
+    axios.post(ApiUrl, {
+      user: {
+        email: data.signUpEmail,
+        nickname: data.nickname,
+        password: data.signUpPassword
+    }}).then(res => {
+      Swal.fire({
+        icon: 'success',
+        title: '水拉水拉!',
+        text: `註冊成功餒! 馬上幫你轉到登入ya~`,
+      });
+      navigate('/');
+      window.history.go(0);
     }).catch(error => {
-      alert(`送出失敗:${JSON.stringify(error.data)}`)  
+      console.log(error);
+      Swal.fire({
+      icon: 'error',
+      title: '我很抱歉...',
+      text: `${error.response.data.message}:${error.response.data.error[0]}`,
+      })
+      window.history.go(0);
+
+      return;
     })
-    console.log(data);
-    navigate('/');
 
   };
   return (<>
@@ -94,15 +129,15 @@ function SignUp() {
         <div>
                 <form className="formControls" onSubmit={handleSubmit(onSubmit)} >
                     <h2 className="formControls_txt">註冊帳號</h2>
-                    <label className="formControls_label" htmlFor="email">Email</label>
-                    <input className="formControls_input" type="email" id="email" name="email" placeholder="請輸入 email" {...register("email", {required: true, pattern: /^\S+@\S+$/i})} />
-                    { errors.email && <span>此欄位不可留空</span>}
+                    <label className="formControls_label" htmlFor="signUpEmail">Email</label>
+                    <input className="formControls_input" type="email" id="signUpEmail" name="signUpEmail" placeholder="請輸入 email" {...register("signUpEmail", {required: true, pattern: /^\S+@\S+$/i})} />
+                    { errors.signUpEmail && <span>此欄位不可留空</span>}
                     <label className="formControls_label" htmlFor="nickname">您的暱稱</label>
                     <input className="formControls_input" type="text" name="nickname" id="nickname" placeholder="請輸入您的暱稱" {...register("nickname", {required: true})}/>
                     { errors.nickname && <span>此欄位不可留空</span>}
-                    <label className="formControls_label" htmlFor="password">密碼</label>
-                    <input className="formControls_input" type="password" name="password" id="password" placeholder="請輸入密碼" {...register("password", {required: true})}  />
-                    { errors.password && <span>此欄位不可留空</span>}
+                    <label className="formControls_label" htmlFor="signUpPassword">密碼</label>
+                    <input className="formControls_input" type="password" name="signUpPassword" id="signUpPassword" placeholder="請輸入密碼" {...register("signUpPassword", {required: true})}  />
+                    { errors.signUpPassword && <span>此欄位不可留空</span>}
                     <label className="formControls_label" htmlFor="signUpConfirmed">再次輸入密碼</label>
                     <input className="formControls_input" type="password" name="signUpConfirmed" id="signUpConfirmed" placeholder="請再次輸入密碼" {...register("signUpConfirmed", {required: true})} />
                     { errors.signUpConfirmed && <span>此欄位不可留空</span>}
@@ -196,7 +231,9 @@ function ToDos() {
     const api = `https://todoo.5xcamp.us/users/sign_out`
     axios.delete(api).then(() => {
       console.log('順利登出');
+
       navigate('/');
+      window.history.go(0);
     })
   }
 
@@ -207,9 +244,9 @@ function ToDos() {
   return (<>
       <div id="todoListPage" className="bg-half">
         <nav>
-            <h1><Link to='./todos'>ONLINE TODO LIST</Link></h1>
+            <h1><Link to='/todos'>ONLINE TODO LIST</Link></h1>
             <ul>
-          <li className="todo_sm"><Link to='./todos'><span>{userName}的代辦</span></Link></li>
+          <li className="todo_sm"><Link to='/todos'><span>{userName}的代辦</span></Link></li>
           <li><Link to="#" onClick={logOut}>登出</Link></li>
             </ul>
         </nav>
