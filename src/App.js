@@ -62,12 +62,13 @@ function LogIn() {
           <form className="formControls" onSubmit={handleSubmit(onSubmitEvent)}>
             <h2 className="formControls_txt">最實用的線上代辦事項服務</h2>
             <label className="formControls_label" htmlFor="email">Email</label>
-            <input className="formControls_input" name='email' id='email'  type="email" placeholder="請輸入 email" {...register("email", { required: true, pattern: /^\S+@\S+$/i })} />
-            {errors.email && <span>此欄位不可留空</span>}
+            <input className="formControls_input" name='email' id='email' placeholder="請輸入 email" {...register("email", { required: { value: true, message: "此欄位必填" }, pattern: { value: /^\S+@\S+$/i, message:'不符合 Email 規則' } })} />
+            {errors.email && errors.email.type === "required" && <span>此欄位不可留空</span>}
+            {errors.email && errors.email.type === "pattern" && <span>不符合 Email 規則</span>}
             <label className="formControls_label" htmlFor="password">密碼</label>
             <input className="formControls_input" name="password" id="password" type="password" placeholder="請輸入密碼" {...register("password", {required: true})} />
             { errors.password && <span>此欄位不可留空</span>}
-            <input className="formControls_btnSubmit" type="submit"  value="登入" />
+            <input className="formControls_btnSubmit" type="submit"  value="登入"  disabled={Object.keys(errors).length > 0}  />
             <Link className="formControls_btnLink" to="/signup">註冊帳號</Link>
             </form>
             </div>
@@ -125,8 +126,9 @@ function SignUp() {
                 <form className="formControls" onSubmit={handleSubmit(onSubmit)} >
                     <h2 className="formControls_txt">註冊帳號</h2>
                     <label className="formControls_label" htmlFor="signUpEmail">Email</label>
-                    <input className="formControls_input" type="email" id="signUpEmail" name="signUpEmail" placeholder="請輸入 email" {...register("signUpEmail", {required: true, pattern: /^\S+@\S+$/i})} />
-                    { errors.signUpEmail && <span>此欄位不可留空</span>}
+                    <input className="formControls_input"  id="signUpEmail" name="signUpEmail" placeholder="請輸入 email" {...register("signUpEmail", {required: true, pattern: /^\S+@\S+$/i})} />
+            {errors.signUpEmail && errors.signUpEmail.type==="required" && <span>此欄位不可留空</span>}
+            {errors.signUpEmail && errors.signUpEmail.type === "pattern" && <span>不符合 Email 規則</span> }
                     <label className="formControls_label" htmlFor="nickname">您的暱稱</label>
                     <input className="formControls_input" type="text" name="nickname" id="nickname" placeholder="請輸入您的暱稱" {...register("nickname", {required: true})}/>
                     { errors.nickname && <span>此欄位不可留空</span>}
@@ -136,7 +138,7 @@ function SignUp() {
                     <label className="formControls_label" htmlFor="signUpConfirmed">再次輸入密碼</label>
                     <input className="formControls_input" type="password" name="signUpConfirmed" id="signUpConfirmed" placeholder="請再次輸入密碼" {...register("signUpConfirmed", {required: true})} />
                     { errors.signUpConfirmed && <span>此欄位不可留空</span>}
-                    <input className="formControls_btnSubmit" type="submit" value="註冊帳號" />
+                    <input className="formControls_btnSubmit" type="submit" value="註冊帳號"  disabled={Object.keys(errors).length > 0}  />
                     <Link className="formControls_btnLink" to="/">登入</Link>
                 </form>
             </div>
@@ -169,12 +171,12 @@ function ToDos() {
         
       })
     } else {
-       Swal.fire({
+      Swal.fire({
         icon: 'error',
         title: '喔~ 大哥&大姊',
         text: `沒有代辦內容讓網頁我很難辦餒`,
       });
-     }
+    }
   }
   function ToggleTab(e) {
     const tabs = document.querySelectorAll('.todoList_tab button');
