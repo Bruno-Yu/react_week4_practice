@@ -228,7 +228,6 @@ function ToDos() {
   function logOut() { 
     const api = `https://todoo.5xcamp.us/users/sign_out`
     axios.delete(api).then(() => {
-      console.log('順利登出');
       delete axios.defaults.headers.common["Authorization"];
         Swal.fire({
         icon: 'success',
