@@ -48,10 +48,7 @@ function LogIn() {
       title: '我很抱歉...',
       text: `${error.response.data.message}:${error.message}`,
         })
-      console.log(error);
-      window.history.go(0)
     })
-    console.log(data);
 
   };
   return (<>
@@ -172,7 +169,11 @@ function ToDos() {
         
       })
     } else {
-      console.log('請輸入內容')
+       Swal.fire({
+        icon: 'error',
+        title: '喔~ 大哥&大姊',
+        text: `沒有代辦內容讓網頁我很難辦餒`,
+      });
      }
   }
   function ToggleTab(e) {
@@ -199,7 +200,6 @@ function ToDos() {
       e.target.classList.add('active');
       setShowData(newData);
     }
-    console.log(showData);
   }
 // 修改狀態
   function ToggleChange(e, id) { 
@@ -229,9 +229,13 @@ function ToDos() {
     const api = `https://todoo.5xcamp.us/users/sign_out`
     axios.delete(api).then(() => {
       console.log('順利登出');
-
+      delete axios.defaults.headers.common["Authorization"];
+        Swal.fire({
+        icon: 'success',
+        title: '登出',
+        text: `成功登出喔!`,
+      });
       navigate('/');
-      window.history.go(0);
     })
   }
 
