@@ -7,13 +7,17 @@ import { useAuth } from './AuthContext';
 export function ToDos() {
   const { userName, data, setData, ApiURL } = useAuth();
   const [input, setInput] = useState('');
+  // 呈現資料
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
+  
+  // 獲取資料
   function getData() {
     axios.get(`${ApiURL}todos`).then(res => {
       setData(res.data.todos);
     });
   }
+  // 加入內容
   function addItem() {
     if (input.trim().length !== 0) {
       const addIn = { 'todo': { 'content': input } };
@@ -31,6 +35,26 @@ export function ToDos() {
       });
     }
   }
+  // 偵測資料所在處 新增active
+  function activeShow(data) { 
+    const tabs = document.querySelectorAll('.todoList_tab button');
+          tabs.forEach(item => {
+        if (item.classList.contains('active')) {
+          if (item.dataset.btn === 'all') {
+            setShowData(data);
+          } else if (item.dataset.btn === 'todo') {
+            let newData = data.filter(item => item.completed_at === null);
+            setShowData(newData);
+          } else if (item.dataset.btn === 'done') { 
+            let newData = data.filter(item => item.completed_at !== null);
+            setShowData(newData);
+          }
+        }
+      });
+  }
+
+
+  //  狀態替換
   function ToggleTab(e) {
     const tabs = document.querySelectorAll('.todoList_tab button');
     function removeActive() {
@@ -91,7 +115,7 @@ export function ToDos() {
   }
 
   useEffect(() => {
-    setShowData(data);
+    activeShow(data);
   }, [data]);
 
   return (<>
@@ -126,7 +150,7 @@ export function ToDos() {
                     return (<>
                       <li id={item.id}>
                         <label className="todoList_label">
-                          <input className="todoList_input" type="checkbox" value="true" checked={item.completed_at === null ? false : true} onClick={(e) => { ToggleChange(e, item.id); }} />
+                          <input className="todoList_input" type="checkbox" value="true" checked={item.completed_at === null ? false : true} onChange={(e) => { ToggleChange(e, item.id); }} />
                           <span>{item.content}</span>
                         </label>
                         <Link to="#" onClick={() => { deleteTodo(item.id); }}>

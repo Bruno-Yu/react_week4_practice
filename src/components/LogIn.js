@@ -33,10 +33,11 @@ export function LogIn() {
       getData();
       navigate('/todos');
     }).catch(error => {
+      console.log(error);
       Swal.fire({
         icon: 'error',
         title: '我很抱歉...',
-        text: `${error.response.data.message}:${error.message}`,
+        text: `${error.response.data.message}:信箱或密碼錯誤`,
       });
     });
 
