@@ -44,7 +44,7 @@ export function SignUp() {
   };
   return (<>
     <div id="signUpPage" className="bg-yellow">
-      <div className="conatiner signUpPage vhContainer">
+      <div className="container signUpPage vhContainer">
         <div className="side">
           <Link to="/"><img className="logoImg" src="https://upload.cc/i1/2022/03/23/rhefZ3.png" alt="" /></Link>
           <img className="d-m-n" src="https://upload.cc/i1/2022/03/23/tj3Bdk.png" alt="workImg" />
